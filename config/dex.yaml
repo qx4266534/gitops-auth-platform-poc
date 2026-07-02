@@ -1,0 +1,82 @@
+issuer: http://localhost:5556/dex
+storage:
+  type: sqlite3
+  config:
+    file: /tmp/dex.db
+
+web:
+  http: 0.0.0.0:5556
+  allowedOrigins: ['*']
+
+grpc:
+  addr: 0.0.0.0:5557
+
+telemetry:
+  http: 0.0.0.0:5558
+
+# Static clients voor platform componenten
+staticClients:
+  - id: gitlab
+    redirectURIs:
+      - "http://gitlab.local/users/auth/openid_connect/callback"
+    name: "GitLab"
+    secret: "gitlab-secret"
+
+  - id: harbor
+    redirectURIs:
+      - "http://harbor.local/c/oidc/callback"
+    name: "Harbor"
+    secret: "harbor-secret"
+
+  - id: kubernetes
+    redirectURIs:
+      - "http://localhost:8000"
+    name: "Kubernetes"
+    secret: "k8s-secret"
+
+  - id: backstage
+    redirectURIs:
+      - "http://localhost:7007/api/auth/oidc/handler/frame"
+    name: "Backstage"
+    secret: "backstage-secret"
+
+# Connectors — LDAP als primaire bron
+connectors:
+  - type: ldap
+    id: ldap
+    name: "Bank LDAP"
+    config:
+      host: openldap:389
+      insecureNoSSL: true  # Alleen voor lokale dev!
+
+      rootCAData: ""
+      bindDN: "cn=admin,dc=platform,dc=bank,dc=local"
+      bindPW: "admin"
+
+      usernamePrompt: Username
+
+      userSearch:
+        baseDN: "ou=users,dc=platform,dc=bank,dc=local"
+        filter: "(objectClass=inetOrgPerson)"
+        username: uid
+        idAttr: DN
+        emailAttr: mail
+        nameAttr: cn
+        preferredUsernameAttr: uid
+
+      groupSearch:
+        baseDN: "ou=groups,dc=platform,dc=bank,dc=local"
+        filter: "(objectClass=groupOfNames)"
+        userMatchers:
+          - userAttr: DN
+            groupAttr: member
+        nameAttr: cn
+
+# Voor lokale testing: static passwords
+# In productie verwijderen!
+enablePasswordDB: true
+staticPasswords:
+  - email: "admin@platform.bank.local"
+    hash: "$2a$10$2b2cU7C/1QW7J7j9L9V7lO9QY7Z7a7b7c7d7e7f7g7h7i7j7k7l7m7n7o7p7q7r7s7t7u7v7w7x7y7z"
+    username: "admin"
+    userID: "admin"
