@@ -1,0 +1,29 @@
+model
+  schema 1.1
+
+type user
+
+type role
+  relations
+    define assignee: [user]
+
+type permission
+  relations
+    define grantee: [user with has_role, role#assignee]
+
+type tenant
+  relations
+    define owner: [user]
+    define developer: [user]
+    define po: [user]
+    define member: owner or developer or po
+    define can_manage_users: owner
+    define can_deploy: owner or developer
+    define can_view: owner or developer or po
+    define can_edit: owner or developer
+    define can_create_project: owner
+    define can_delete_project: owner
+
+condition has_role(role_name: string) {
+  role_name == "owner" || role_name == "developer" || role_name == "po"
+}

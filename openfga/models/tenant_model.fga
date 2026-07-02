@@ -1,0 +1,100 @@
+model
+  schema 1.1
+
+type user
+
+type group
+  relations
+    define member: [user, group#member]
+
+type platform_role
+  relations
+    define assignee: [user, group#member]
+
+type tenant
+  relations
+    define owner: [user, group#member, platform_role#assignee]
+    define developer: [user, group#member, platform_role#assignee]
+    define po: [user, group#member, platform_role#assignee]
+    define member: owner or developer or po
+    define can_manage_tenant: owner
+    define can_create_project: owner
+    define can_delete_project: owner
+    define can_manage_users: owner
+    define can_deploy: owner or developer
+    define can_edit_code: owner or developer
+    define can_view_board: owner or developer or po
+    define can_view_audit_log: owner
+    define can_assign_roles: owner
+
+type team
+  relations
+    define tenant: [tenant]
+    define lead: [user, group#member]
+    define member: [user, group#member] or lead
+    define can_manage_team: lead or owner from tenant
+    define can_view_team: member or member from tenant
+
+type project
+  relations
+    define tenant: [tenant]
+    define team: [team]
+    define owner: [user, group#member]
+    define editor: [user, group#member] or owner
+    define viewer: [user, group#member] or editor or member from tenant
+    define can_manage_project: owner or owner from tenant
+    define can_edit: editor or developer from tenant
+    define can_view: viewer or po from tenant
+    define can_deploy: editor or developer from tenant
+
+type resource
+  relations
+    define project: [project]
+    define owner: [user]
+    define editor: [user] or owner
+    define viewer: [user] or editor
+    define can_manage: owner or can_manage_project from project
+    define can_edit: editor or can_edit from project
+    define can_view: viewer or can_view from project
+
+type gitlab_group
+  relations
+    define tenant: [tenant]
+    define owner: [user]
+    define maintainer: [user] or owner
+    define developer: [user] or maintainer
+    define reporter: [user] or developer
+    define guest: [user] or reporter
+
+type gitlab_project
+  relations
+    define group: [gitlab_group]
+    define owner: [user]
+    define maintainer: [user] or owner
+    define developer: [user] or maintainer
+    define reporter: [user] or developer
+    define guest: [user] or reporter
+
+type harbor_project
+  relations
+    define tenant: [tenant]
+    define project_admin: [user]
+    define maintainer: [user] or project_admin
+    define developer: [user] or maintainer
+    define guest: [user] or developer
+    define limited_guest: [user] or guest
+
+type namespace
+  relations
+    define tenant: [tenant]
+    define admin: [user]
+    define edit: [user] or admin
+    define view: [user] or edit
+
+type system
+  relations
+    define admin: [user]
+    define can_create_tenant: admin
+    define can_delete_tenant: admin
+    define can_manage_platform_roles: admin
+    define can_view_all_audit_logs: admin
