@@ -1,0 +1,45 @@
+apiVersion: platform.bank/v1
+kind: Tenant
+metadata:
+  name: retail-banking
+  display_name: "Retail Banking"
+  department: "IT Retail"
+  contact_email: "retail-banking@bank.local"
+
+spec:
+  platform_roles:
+    - role: owner
+      users:
+        - username: jan.devries
+          email: jan.devries@bank.local
+    - role: developer
+      users:
+        - username: peter.jansen
+          email: peter.jansen@bank.local
+    - role: po
+      users:
+        - username: lisa.bakker
+          email: lisa.bakker@bank.local
+
+  custom_roles:
+    - name: security-officer
+      users:
+        - username: tom.secure
+          email: tom.secure@bank.local
+      approved_by: platform-team
+
+  projects:
+    - name: retail-webshop
+      gitlab:
+        group_path: "retail-banking/retail-webshop"
+        projects:
+          - name: frontend
+          - name: backend
+          - name: infrastructure
+      harbor:
+        project_name: "retail-webshop"
+      kubernetes:
+        namespaces:
+          - name: retail-webshop-dev
+          - name: retail-webshop-staging
+          - name: retail-webshop-prod

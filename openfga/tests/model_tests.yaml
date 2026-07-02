@@ -1,0 +1,63 @@
+tests:
+  - name: test-tenant-owner-permissions
+    model: ../models/tenant_model.fga
+    tuples:
+      - user: user:alice
+        relation: owner
+        object: tenant:alpha
+    check:
+      - user: user:alice
+        object: tenant:alpha
+        assertions:
+          can_manage_tenant: true
+          can_create_project: true
+          can_deploy: true
+          can_assign_roles: true
+
+  - name: test-tenant-developer-permissions
+    model: ../models/tenant_model.fga
+    tuples:
+      - user: user:bob
+        relation: developer
+        object: tenant:alpha
+    check:
+      - user: user:bob
+        object: tenant:alpha
+        assertions:
+          can_manage_tenant: false
+          can_create_project: false
+          can_deploy: true
+          can_assign_roles: false
+
+  - name: test-tenant-po-permissions
+    model: ../models/tenant_model.fga
+    tuples:
+      - user: user:charlie
+        relation: po
+        object: tenant:alpha
+    check:
+      - user: user:charlie
+        object: tenant:alpha
+        assertions:
+          can_manage_tenant: false
+          can_deploy: false
+          can_view_board: true
+
+  - name: test-cross-tenant-isolation
+    model: ../models/tenant_model.fga
+    tuples:
+      - user: user:alice
+        relation: owner
+        object: tenant:alpha
+      - user: user:bob
+        relation: developer
+        object: tenant:beta
+    check:
+      - user: user:alice
+        object: tenant:beta
+        assertions:
+          member: false
+      - user: user:bob
+        object: tenant:alpha
+        assertions:
+          member: false

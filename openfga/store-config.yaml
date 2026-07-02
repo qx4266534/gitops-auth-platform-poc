@@ -1,0 +1,16 @@
+store:
+  name: platform-auth
+
+tuples:
+  - user: user:alice
+    relation: owner
+    object: tenant:alpha
+  - user: user:bob
+    relation: developer
+    object: tenant:alpha
+  - user: user:charlie
+    relation: po
+    object: tenant:alpha
+  - user: user:alice
+    relation: admin
+    object: system:platform

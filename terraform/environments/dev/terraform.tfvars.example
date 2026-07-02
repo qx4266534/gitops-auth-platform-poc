@@ -1,0 +1,53 @@
+# Tenant configuratie
+tenant_name   = "retail-banking"
+display_name  = "Retail Banking"
+department    = "IT Retail"
+contact_email = "retail-banking@bank.local"
+
+# Gebruikers (LDAP usernames)
+owners     = ["jan.devries"]
+developers = ["peter.jansen", "marie.klaassen"]
+pos        = ["lisa.bakker"]
+
+# GitLab projecten
+projects = [
+  {
+    name = "retail-webshop"
+    sub_projects = ["frontend", "backend", "infrastructure"]
+  },
+  {
+    name = "retail-mobile"
+    sub_projects = ["ios-app", "android-app", "api-gateway"]
+  }
+]
+
+# Harbor projecten
+harbor_projects = ["retail-webshop", "retail-mobile"]
+
+# Kubernetes namespaces
+namespaces = [
+  {
+    name = "retail-webshop-dev"
+    resource_quota = {
+      cpu    = "20"
+      memory = "64Gi"
+      pods   = "50"
+    }
+  },
+  {
+    name = "retail-webshop-staging"
+    resource_quota = {
+      cpu    = "10"
+      memory = "32Gi"
+      pods   = "20"
+    }
+  },
+  {
+    name = "retail-webshop-prod"
+    resource_quota = {
+      cpu    = "40"
+      memory = "128Gi"
+      pods   = "100"
+    }
+  }
+]
